@@ -97,7 +97,7 @@ def Open_File():
     cnt = fullpath.count("/")
     splitpath = fullpath.split("/")
     filename = splitpath[cnt]
-    realpath = fullpath.replace(filename,"")
+    realpath = fullpath.replace(filename,"") ( )
     os.chdir(realpath)
     file_object = io.open(filename,'r+b')
     print file_object
@@ -115,7 +115,7 @@ def File_MetaData(file_object):
     xsm.seek(20, os.SEEK_CUR)
     SoftName_Length = struct.unpack('<I', xsm.read(4))[0]
     SoftName = xsm.read(SoftName_Length)
-    SoftPath_Length = struct.unpack('<I', xsm.read(4))[0]
+    SoftPath_Length = struct.unpack('<I', xsm.read(4))[0]67-
     SoftPath = xsm.read(SoftPath_Length)
     CompileDate_Length = struct.unpack('<I', xsm.read(4))[0]
     CompileDate = xsm.read(CompileDate_Length)
@@ -299,5 +299,3 @@ print "EOF"
 xsm.close()
 print "\n"
 print "EOS"
-
-###########################################################################################################################################################
