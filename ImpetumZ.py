@@ -23,7 +23,7 @@ import maya.api.OpenMaya as om
 
 ##### Arrays #####
 
-
+Temp_data = []
 
 ##### Dictionnaries #####
 
@@ -37,43 +37,29 @@ Animation = {}
 
 # Assigned Objects #
 
-
-
 ###########################################################################################################################################################
 
 ################################################################## Functions Definitions ##################################################################
 
 ##### Maya Functions #####
 
-# ImpetumZ #
+# Math
 
-def keyframe12(): 
-    Byte_0 = xsm.read(1)
-    Byte_1 = xsm.read(1)
-    Bytes0 = struct.pack('2c0l', Byte_0, Byte_1)
-    Quat0 = struct.unpack('<f', Bytes0)
-    Byte_2 = xsm.read(1)
-    Byte_3 = xsm.read(1)
-    Bytes1 = struct.pack('2c0l', Byte_2, Byte_3)
-    Quat1 = struct.unpack('<f', Bytes1)
-    Byte_4 = xsm.read(1)
-    Byte_5 = xsm.read(1)
-    Bytes2 = struct.pack('2c0l', Byte_4, Byte_5)
-    Quat2 = struct.unpack('<f', Bytes2)  
-    Byte_6 = xsm.read(1)
-    Byte_7 = xsm.read(1)
-    Bytes3 = struct.pack('2c0l', Byte_6, Byte_7)
-    Quat3 = struct.unpack('<f', Bytes3)
-    Time = struct.unpack('<f', xsm.read(4))
-    return Quat0, Quat1, Quat2, Quat3, Time
+num = 32767.0
+num2=num*-1
+def Calc_Quat(Short):
+    if(Short <= num and Short >= num2):
+            Quat = Short / num
+    else:
+        print "internal error value out of range ! Killing process"
+        return sys.exit()
 
-def keyframe16():
-    Float0 = struct.unpack('<f', xsm.read(4))
-    Float1 = struct.unpack('<f', xsm.read(4))
-    Float2 = struct.unpack('<f', xsm.read(4))
-    Float3 = struct.unpack('<f', xsm.read(4))
-    return Float0, Float1, Float2, Float3
-    
+    return Quat
+
+def Switch_Sign(Var):
+    Switched_Var = Var*-1
+    return Switched_Var
+
 ##### Pythonic Functions #####
 
 # Array Operations #
@@ -84,6 +70,13 @@ def Log_Arrays(array):
         element = array[i]
         print element
     print ""
+
+def Exist_Names(text):
+    exist = 0
+    for j in range(len(Names)):
+        if(Names[j][2][0] == text):
+            exist = 1
+    return exist
 
 # Strings Operations #
 
@@ -107,6 +100,7 @@ def Open_File():
     realpath = fullpath.replace(filename,"")
     os.chdir(realpath)
     file_object = io.open(filename,'r+b')
+    print file_object
     return file_object
 
 # ImpetumZ #
@@ -130,6 +124,21 @@ def File_MetaData(file_object):
     Object_Count = struct.unpack('<I', xsm.read(4))[0]
     return xsm, Object_Count #, SoftName, SoftPath, CompileDate
 
+def keyframe12():
+    Short0 = struct.unpack('<h',xsm.read(2))[0]
+    Short1 = struct.unpack('<h',xsm.read(2))[0]
+    Short2 = struct.unpack('<h',xsm.read(2))[0]
+    Short3 = struct.unpack('<h',xsm.read(2))[0]
+    Float = struct.unpack('<f', xsm.read(4))[0]
+    return Short0, Short1, Short2, Short3, Float
+
+def keyframe16():
+    Float0 = struct.unpack('<f', xsm.read(4))[0]
+    Float1 = struct.unpack('<f', xsm.read(4))[0]
+    Float2 = struct.unpack('<f', xsm.read(4))[0]
+    Float3 = struct.unpack('<f', xsm.read(4))[0]
+    return Float0, Float1, Float2, Float3
+
 def FileData():
     xsm.seek(16, os.SEEK_CUR)
     xsm.seek(16, os.SEEK_CUR)
@@ -142,7 +151,8 @@ def FileData():
     xsm.seek(4, os.SEEK_CUR) # C++ compiler delimiter 0xFFFF7F7F
     BoneName_Length = struct.unpack('<I', xsm.read(4))[0]
     BoneName = xsm.read(BoneName_Length)
-    print Clean_Name(BoneName)
+    BoneName = Clean_Name(BoneName)
+    #print BoneName
     Keyframes0 = []
     Keyframes1 = []
     Keyframes2 = []
@@ -150,22 +160,98 @@ def FileData():
 
     for i in range(Type0_Count):
         Keyframes0.append([])
-        Keyframes0[i].append(keyframe16())
+        Tuple0 = keyframe16()
+        x0 = Tuple0[0]
+        y0 = Tuple0[1]
+        z0 = Tuple0[2]
+        time0 = Tuple0[3]
+        Keyframes0[i].append(x0)
+        Keyframes0[i].append(y0)
+        Keyframes0[i].append(z0)
+        Keyframes0[i].append(time0)
+
     for i in range(Type1_Count):
         Keyframes1.append([])
-        Keyframes1[i].append(keyframe12())
+        Tuple1 = keyframe12()
+        x1 = Calc_Quat(Tuple1[0])
+        y1 = Calc_Quat(Tuple1[1])
+        z1 = Calc_Quat(Tuple1[2])
+        w1 = Calc_Quat(Tuple1[3]) 
+        time1 = Tuple1[4]
+        Keyframes1[i].append(x1)
+        Keyframes1[i].append(y1)
+        Keyframes1[i].append(z1)
+        Keyframes1[i].append(w1)
+        Keyframes1[i].append(time1)
+
     for i in range(Type2_Count):
         Keyframes2.append([])
-        Keyframes2[i].append(keyframe16())
+        Tuple2 = keyframe16()
+        x2 = Tuple2[0]
+        y2 = Tuple2[2]
+        z2 = Tuple2[1]
+        time2 = Tuple2[3]
+        Keyframes2[i].append(x2)
+        Keyframes2[i].append(y2)
+        Keyframes2[i].append(z2)
+        Keyframes2[i].append(time2)
+
     for i in range(Type3_Count):
         Keyframes3.append([])
-        Keyframes3[i].append(keyframe12())
+        Tuple3 = keyframe12()
+        x3 = Tuple3[0]
+        y3 = Tuple3[1]
+        z3 = Tuple3[2]
+        w3 = Tuple3[3]
+        time3 = Tuple3[4]
+        Keyframes3[i].append(w3)
+        Keyframes3[i].append(x3)
+        Keyframes3[i].append(y3)
+        Keyframes3[i].append(z3)
+        Keyframes3[i].append(time3)
 
+    print BoneName
     Log_Arrays(Keyframes0)
     Log_Arrays(Keyframes1)
     Log_Arrays(Keyframes2)
     Log_Arrays(Keyframes3)
-    return Keyframes0, Keyframes1, Keyframes2, Keyframes3, BoneName
+
+    Tuple = (Keyframes0, Keyframes1, Keyframes2, Keyframes3)
+    return BoneName, Tuple
+
+def Bind_Keyframes(Keyframe_Count):
+    for i in range(Keyframe_Count - 1):
+        for key in Animation:
+            if(Exist_Names(key)):
+                Transform = om.MFnTransform(Get_MObject(key))
+                Keyframes_Lists = Animation.get(key)
+                List0 = Keyframes_Lists[0]
+                List1 = Keyframes_Lists[1]
+                List2 = Keyframes_Lists[2]
+                List3 = Keyframes_Lists[3]
+                Prompt = raw_input()
+                if(Prompt == 1):
+                    sys.exit()
+                else:
+                    pass
+                if(len(List0) > 0):
+                    pass
+                    '''
+                    Vec3_0 = om.MVector(List0[i+1][0], List0[i+1][1], List0[i+1][2])
+                    Transform.setTranslation(Vec3_0,2)'''
+                if(len(List1) > 0):
+                    rx0 = List1[i][0]
+                    ry0 = List1[i][2]
+                    rz0 = List1[i][1]
+                    rw0 = List1[i][3]
+                    Quat_0 = om.MQuaternion(rx0, ry0, Switch_Sign(rz0), rw0)
+                    Transform.setRotation(Quat_0,2)
+                if(len(List2) > 0):
+                    pass
+                if(len(List3) > 0):
+                    pass
+
+        cmds.setKeyframe( t=[i+1])
 
 
 ###########################################################################################################################################################
@@ -177,10 +263,38 @@ xsm = Args[0]
 
 for i in range(Args[1]):
     Args0 = FileData()
-    for i in range(3):
-        if(len(Args0[i]) > 0):
-            Animation[Args0[4]] = Args0[i]
-  
+    Animation[Args0[0]] = Args0[1]
+    if(Args0[0] == "Object_Bip01"):
+        Temp_data0 = Args0[1]
+    if(Args0[0] == "Object_Bip01_L_Thigh"):
+        Temp_data1 = Args0[1]
+    if(Args0[0] == "Object_Bip01_R_Thigh"):
+        Temp_data2 = Args0[1]
+    if(Args0[0] == "Object_Bip01_L_Calf"):
+        Temp_data3 = Args0[1]
+    if(Args0[0] == "Object_Bip01_R_Calf"):
+        Temp_data4 = Args0[1]
+    if(Args0[0] == "Object_Bip01_Spine"):
+        Temp_data5 = Args0[1]
+    if(Args0[0] == "Object_Bip01_Spine1"):
+        Temp_data6 = Args0[1]
+    if(Args0[0] == "Object_Bip01_Spine2"):
+        Temp_data7 = Args0[1]
+    if(Args0[0] == "Object_Bip01_Neck"):
+        Temp_data8 = Args0[1]
+    if(Args0[0] == "Object_Bip01_Head"):
+        Temp_data9 = Args0[1]
+    if(Args0[0] == "Object_Bip01_L_UpperArm"):
+        Temp_data10 = Args0[1]
+    if(Args0[0] == "Object_Bip01_L_Forearm"):
+        Temp_data11 = Args0[1]
+    if(Args0[0] == "Object_Bip01_R_UpperArm"):
+        Temp_data12 = Args0[1]
+    if(Args0[0] == "Object_Bip01_R_Forearm"):
+        Temp_data13 = Args0[1]
+        
+#Keyframe_Count = len(Tuple[1])
+#Bind_Keyframes(Keyframe_Count)
 print "EOF"
 xsm.close()
 print "\n"
