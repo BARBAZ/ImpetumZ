@@ -45,19 +45,20 @@ Animation = {}
 
 # Math
 
-num = 32767.0
-num2=num*-1
+max = 32767.0
+min = max * -1
+
 def Calc_Quat(Short):
-    if(Short <= num and Short >= num2):
-            Quat = Short / num
+    if(Short <= max and Short >= min):
+            Quat = Short / max
     else:
         print "internal error value out of range ! Killing process"
         return sys.exit()
 
     return Quat
 
-def Switch_Sign(Var):
-    Switched_Var = Var*-1
+def Negate(Var):
+    Switched_Var = Var * -1
     return Switched_Var
 
 ##### Pythonic Functions #####
@@ -97,7 +98,7 @@ def Open_File():
     cnt = fullpath.count("/")
     splitpath = fullpath.split("/")
     filename = splitpath[cnt]
-    realpath = fullpath.replace(filename,"") ( )
+    realpath = fullpath.replace(filename,"")
     os.chdir(realpath)
     file_object = io.open(filename,'r+b')
     print file_object
@@ -115,7 +116,7 @@ def File_MetaData(file_object):
     xsm.seek(20, os.SEEK_CUR)
     SoftName_Length = struct.unpack('<I', xsm.read(4))[0]
     SoftName = xsm.read(SoftName_Length)
-    SoftPath_Length = struct.unpack('<I', xsm.read(4))[0]67-
+    SoftPath_Length = struct.unpack('<I', xsm.read(4))[0]
     SoftPath = xsm.read(SoftPath_Length)
     CompileDate_Length = struct.unpack('<I', xsm.read(4))[0]
     CompileDate = xsm.read(CompileDate_Length)
@@ -251,7 +252,7 @@ def Bind_Keyframes(Keyframe_Count):
                 if(len(List3) > 0):
                     pass
 
-        cmds.setKeyframe( t=[i+1])
+        cmds.setKeyframe(t=[i+1])
 
 
 ###########################################################################################################################################################
