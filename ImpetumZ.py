@@ -67,11 +67,22 @@ def Set_Quat(Joint,x,y,z,w):
     Transform = om.MFnTransform(Get_MObject(Joint))
     MQuat = om.MQuaternion(x,y,z,w)
     Transform.setRotation(MQuat, 2)
+    del Transform
+
 
 def Get_Rot(Joint, Mode):
     Transform = om.MFnTransform(Get_MObject(Joint))
     return Transform.rotation(2, Mode)
 
+def Joint_Anim_Test(KeyframesList, Joint):
+    for i in range(len(KeyframesList[1])):
+        x = KeyframesList[1][i][0]
+        y = KeyframesList[1][i][1]
+        z = KeyframesList[1][i][2]
+        w = KeyframesList[1][i][3]
+        Set_Quat(Joint,x,y,z,w)
+        cmds.setKeyframe(Joint , t=[i+1])
+     
 
 ##### Pythonic Functions #####
 
@@ -161,6 +172,8 @@ def FileData():
     Type1_Count = struct.unpack('<I', xsm.read(4))[0]
     Type2_Count = struct.unpack('<I', xsm.read(4))[0]
     Type3_Count = struct.unpack('<I', xsm.read(4))[0]
+    print("Translation Keyframes %d" % (Type0_Count) )
+    print("Rotation Keyframes %d" % (Type1_Count) )
     xsm.seek(4, os.SEEK_CUR) # C++ compiler delimiter 0xFFFF7F7F
     BoneName_Length = struct.unpack('<I', xsm.read(4))[0]
     BoneName = xsm.read(BoneName_Length)
@@ -305,6 +318,8 @@ for i in range(Args[1]):
         Temp_data12 = Args0[1]
     if(Args0[0] == "Object_Bip01_R_Forearm"):
         Temp_data13 = Args0[1]
+
+Joint_Anim_Test(Temp_data3, "Object_Bip01_L_Calf")
         
 #Keyframe_Count = len(Tuple[1])
 #Bind_Keyframes(Keyframe_Count)
