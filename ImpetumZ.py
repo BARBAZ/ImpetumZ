@@ -61,6 +61,18 @@ def Negate(Var):
     Switched_Var = Var * -1
     return Switched_Var
 
+# Debug
+
+def Set_Quat(Joint,x,y,z,w):
+    Transform = om.MFnTransform(Get_MObject(Joint))
+    MQuat = om.MQuaternion(x,y,z,w)
+    Transform.setRotation(MQuat, 2)
+
+def Get_Rot(Joint, Mode):
+    Transform = om.MFnTransform(Get_MObject(Joint))
+    return Transform.rotation(2, Mode)
+
+
 ##### Pythonic Functions #####
 
 # Array Operations #
