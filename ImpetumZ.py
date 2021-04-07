@@ -19,7 +19,7 @@ import maya.api.OpenMaya as om
 
 ##### Variables #####
 
-
+ffilters = "EmotionFX Animations Files (*.xsm);; All Files (*.*)"
 
 ##### Arrays #####
 
@@ -66,9 +66,8 @@ def Negate(Var):
 def Set_Quat(Joint,x,y,z,w):
     Transform = om.MFnTransform(Get_MObject(Joint))
     MQuat = om.MQuaternion(x,y,z,w)
-    Transform.setRotation(MQuat, 2)
-    del Transform
-
+    Transform.setRotation(MQuat, 1)
+    print "done 1 Quat !"
 
 def Get_Rot(Joint, Mode):
     Transform = om.MFnTransform(Get_MObject(Joint))
@@ -116,7 +115,7 @@ def Clean_Name(text):
 # IO
 
 def Open_File():
-    fullpath = cmds.fileDialog2(fileMode=1)
+    fullpath = cmds.fileDialog2(fileMode=1, ff=ffilters)
     fullpath = str(fullpath[0])
     cnt = fullpath.count("/")
     splitpath = fullpath.split("/")
@@ -318,8 +317,22 @@ for i in range(Args[1]):
         Temp_data12 = Args0[1]
     if(Args0[0] == "Object_Bip01_R_Forearm"):
         Temp_data13 = Args0[1]
+    if(Args0[0] == "Object_Bip01"):
+        Temp_data14 = Args0[1]
+    if(Args0[0] == "Object_Bip01_Pelvis"):
+        Temp_data15 = Args0[1]
 
+
+'''
 Joint_Anim_Test(Temp_data3, "Object_Bip01_L_Calf")
+Joint_Anim_Test(Temp_data1, "Object_Bip01_L_Thigh")
+Joint_Anim_Test(Temp_data4, "Object_Bip01_R_Calf")
+Joint_Anim_Test(Temp_data2, "Object_Bip01_R_Thigh")
+Joint_Anim_Test(Temp_data5, "Object_Bip01_Spine")
+Joint_Anim_Test(Temp_data6, "Object_Bip01_Spine1")
+Joint_Anim_Test(Temp_data14, "Object_Bip01")
+Joint_Anim_Test(Temp_data15, "Object_Bip01_Pelvis")
+'''
         
 #Keyframe_Count = len(Tuple[1])
 #Bind_Keyframes(Keyframe_Count)
