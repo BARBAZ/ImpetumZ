@@ -73,6 +73,16 @@ def Get_Rot(Joint, Mode):
     Transform = om.MFnTransform(Get_MObject(Joint))
     return Transform.rotation(2, Mode)
 
+def Log_Quat():
+    def QuatP():
+        Rot = str(Get_Rot(Name_Selected(),1))
+        print Rot
+
+    STuple = (Name_Selected(),'.rotate')
+    attr = "".join(STuple)
+    cmds.scriptJob(attributeChange=[attr, QuatP])
+    return 0
+
 def Joint_Anim_Test(KeyframesList, Joint):
     for i in range(len(KeyframesList[1])):
         x = KeyframesList[1][i][0]
@@ -332,6 +342,9 @@ Joint_Anim_Test(Temp_data5, "Object_Bip01_Spine")
 Joint_Anim_Test(Temp_data6, "Object_Bip01_Spine1")
 Joint_Anim_Test(Temp_data14, "Object_Bip01")
 Joint_Anim_Test(Temp_data15, "Object_Bip01_Pelvis")
+Joint_Anim_Test(Temp_data3, "joint2")
+Joint_Anim_Test(Temp_data1, "joint1")
+
 '''
         
 #Keyframe_Count = len(Tuple[1])
