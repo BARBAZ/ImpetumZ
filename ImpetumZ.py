@@ -20,10 +20,12 @@ import maya.api.OpenMaya as om
 ##### Variables #####
 
 ffilters = "EmotionFX Animations Files (*.xsm);; All Files (*.*)"
+o = 0
 
 ##### Arrays #####
 
 Temp_data = []
+Temp_Quat =[]
 
 ##### Dictionnaries #####
 
@@ -64,9 +66,11 @@ def Negate(Var):
 # Debug
 
 def Set_Quat(Joint,x,y,z,w):
-    Transform = om.MFnTransform(Get_MObject(Joint))
+    Transform = om.MFnTransform(Get_DAG(Joint))
     MQuat = om.MQuaternion(x,y,z,w)
-    Transform.setRotation(MQuat, 1)
+    MQuat.__imul__(Quat2)
+    print MQuat
+    Transform.setRotation(MQuat, 2)
     print "done 1 Quat !"
 
 def Get_Rot(Joint, Mode):
@@ -173,7 +177,10 @@ def keyframe16():
     return Float0, Float1, Float2, Float3
 
 def FileData():
-    xsm.seek(16, os.SEEK_CUR)
+    xsm.seek(8, os.SEEK_CUR)
+    Temp_Quat.append([])
+    for i in range(4):
+        Temp_Quat[o].append(Calc_Quat(struct.unpack('<h', xsm.read(2))[0]))
     xsm.seek(16, os.SEEK_CUR)
     xsm.seek(24, os.SEEK_CUR)
     xsm.seek(24, os.SEEK_CUR)
@@ -229,7 +236,7 @@ def FileData():
         Keyframes2[i].append(x2)
         Keyframes2[i].append(y2)
         Keyframes2[i].append(z2)
-        Keyframes2[i].append(time2)
+        Keyframes2[i].append(time2) 
 
     for i in range(Type3_Count):
         Keyframes3.append([])
@@ -297,6 +304,7 @@ Args = File_MetaData(File_Header(Open_File()))
 xsm = Args[0]
 
 for i in range(Args[1]):
+    print o
     Args0 = FileData()
     Animation[Args0[0]] = Args0[1]
     if(Args0[0] == "Object_Bip01"):
@@ -331,6 +339,7 @@ for i in range(Args[1]):
         Temp_data14 = Args0[1]
     if(Args0[0] == "Object_Bip01_Pelvis"):
         Temp_data15 = Args0[1]
+    o += 1
 
 
 '''
@@ -344,6 +353,8 @@ Joint_Anim_Test(Temp_data14, "Object_Bip01")
 Joint_Anim_Test(Temp_data15, "Object_Bip01_Pelvis")
 Joint_Anim_Test(Temp_data3, "joint2")
 Joint_Anim_Test(Temp_data1, "joint1")
+Joint_Anim_Test(Temp_data5, "joint4")
+Joint_Anim_Test(Temp_data6, "joint5")
 
 '''
         
