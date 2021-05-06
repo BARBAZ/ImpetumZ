@@ -68,13 +68,11 @@ def Negate(Var):
 def Set_Quat(Joint,x,y,z,w):
     Transform = om.MFnTransform(Get_DAG(Joint))
     MQuat = om.MQuaternion(x,y,z,w)
-    MQuat.__imul__(Quat2)
-    print MQuat
     Transform.setRotation(MQuat, 2)
-    print "done 1 Quat !"
+    print "Keyframe Bound"
 
 def Get_Rot(Joint, Mode):
-    Transform = om.MFnTransform(Get_MObject(Joint))
+    Transform = om.MFnTransform(Get_DAG(Joint))
     return Transform.rotation(2, Mode)
 
 def Log_Quat():
@@ -95,7 +93,13 @@ def Joint_Anim_Test(KeyframesList, Joint):
         w = KeyframesList[1][i][3]
         Set_Quat(Joint,x,y,z,w)
         cmds.setKeyframe(Joint , t=[i+1])
-     
+
+# UI
+
+def Set_Parent_NR(): # Set Objects relationship without affecting their transform attributes.
+    for i in range(len(Names)):
+        if(Names[i][1][0] != 0xFFFFFFFF):
+            cmds.parent(Names[i][2][0] ,Names[i][3][0])
 
 ##### Pythonic Functions #####
 
@@ -178,9 +182,11 @@ def keyframe16():
 
 def FileData():
     xsm.seek(8, os.SEEK_CUR)
-    Temp_Quat.append([])
-    for i in range(4):
-        Temp_Quat[o].append(Calc_Quat(struct.unpack('<h', xsm.read(2))[0]))
+    x = Calc_Quat(struct.unpack('<h', xsm.read(2))[0])
+    y = Calc_Quat(struct.unpack('<h', xsm.read(2))[0])
+    z = Calc_Quat(struct.unpack('<h', xsm.read(2))[0])
+    w = Calc_Quat(struct.unpack('<h', xsm.read(2))[0])
+    Bind_Pose_Quat = om.MQuaternion(0,0,0,1)
     xsm.seek(16, os.SEEK_CUR)
     xsm.seek(24, os.SEEK_CUR)
     xsm.seek(24, os.SEEK_CUR)
@@ -193,6 +199,12 @@ def FileData():
     xsm.seek(4, os.SEEK_CUR) # C++ compiler delimiter 0xFFFF7F7F
     BoneName_Length = struct.unpack('<I', xsm.read(4))[0]
     BoneName = xsm.read(BoneName_Length)
+
+    for i in range(len(Names)):
+        if(Names[i][2][0] == BoneName):
+            tn = om.MFnTransform(Get_MObject(BoneName))
+            tn.setRotation(Bind_Pose_Quat,2)
+
     BoneName = Clean_Name(BoneName)
     #print BoneName
     Keyframes0 = []
@@ -300,8 +312,9 @@ def Bind_Keyframes(Keyframe_Count):
 
 ################################################################### Script instructions ###################################################################
 
+Object_World_Parent() # reparent all joints to world space
 Args = File_MetaData(File_Header(Open_File()))
-xsm = Args[0]
+xsm = Args[0] 
 
 for i in range(Args[1]):
     print o
@@ -339,8 +352,19 @@ for i in range(Args[1]):
         Temp_data14 = Args0[1]
     if(Args0[0] == "Object_Bip01_Pelvis"):
         Temp_data15 = Args0[1]
+    if(Args0[0] == "Object_Bip01_L_Foot"):
+        Temp_data16 = Args0[1]
+    if(Args0[0] == "Object_Bip01_R_Foot"):
+        Temp_data17 = Args0[1]
+    '''
+    if(Args0[0] == "Object_Bip01_Pelvis"):
+        Temp_data15 = Args0[1]
+    if(Args0[0] == "Object_Bip01_Pelvis"):
+        Temp_data15 = Args0[1]
+    '''
     o += 1
 
+Set_Parent()
 
 '''
 Joint_Anim_Test(Temp_data3, "Object_Bip01_L_Calf")
@@ -351,6 +375,8 @@ Joint_Anim_Test(Temp_data5, "Object_Bip01_Spine")
 Joint_Anim_Test(Temp_data6, "Object_Bip01_Spine1")
 Joint_Anim_Test(Temp_data14, "Object_Bip01")
 Joint_Anim_Test(Temp_data15, "Object_Bip01_Pelvis")
+Joint_Anim_Test(Temp_data16, "Object_Bip01_L_Foot")
+Joint_Anim_Test(Temp_data17, "Object_Bip01_R_Foot")
 Joint_Anim_Test(Temp_data3, "joint2")
 Joint_Anim_Test(Temp_data1, "joint1")
 Joint_Anim_Test(Temp_data5, "joint4")
